@@ -12,5 +12,5 @@ It shows how to get the extract of the binary with IDA
 
 ## virus-worm
 
-It contains a simple example of Walmare. 
+It contains a simple example of Malware. 
 From: https://github.com/chsclarke/Virus
