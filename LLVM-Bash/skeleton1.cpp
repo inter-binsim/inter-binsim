@@ -15,29 +15,29 @@
 using namespace std;
 using namespace llvm;
 
-//bool SkeletonPass::dfs(BasicBlock* start, BasicBlock* end);
+//
 static LLVMContext Context;
 struct SkeletonPass : public FunctionPass {
     static char ID;
     SkeletonPass() : FunctionPass(ID) {}
     map<string, BasicBlock*> map_n_b;
     vector< BasicBlock * > bb_vector;
-    vector< BasicBlock * > bb_fakeins;//block to insert fake instructions
+    vector< BasicBlock * > bb_fakeins;//
     map<BasicBlock*, int> visit;
     map<string, string> map_b;
-    map<string, string> map_b_r;//reverse of map_b
-    map<string, int> suc_num;//map: target block, number of suc
-    map<string, vector<string> > suc_str; //target func suc basic block name
-    vector<pair<BasicBlock*, BasicBlock*>> cut_pair;// saving pair relation
-    ReturnInst* returninst;// save return inst
+    map<string, string> map_b_r;//
+    map<string, int> suc_num;//
+    map<string, vector<string> > suc_str; //
+    vector<pair<BasicBlock*, BasicBlock*>> cut_pair;//
+    ReturnInst* returninst;//
 
-    //string funcAname = "show_data";
+    //
     string funcBname = "main";
 
     virtual bool runOnFunction(Function &F) {
-//      errs() << "I saw a function called !" << F.getName() << "!\n";
-      //select_ins(F);
-      //string func_name="adaline_fit_sample";//F.getName().data();
+//
+      //
+      //
       std::ifstream in_f;
       in_f.open(" ./passsource_target.txt");
       string match_l;
@@ -56,14 +56,14 @@ struct SkeletonPass : public FunctionPass {
       }
       errs() << "src:" << F.getName() << " = " << func_name << "\n";
       cfg_transfer(F);
-      //insert_fakeins();
+      //
       
       errs()<<"transfer finish"<<"\n";
       return false;
     }
 
     void select_ins(Function &F);
-    void create_line(BasicBlock* cur_bb, string target_b, int num_s, Function &F);//int num_s;//target_b successor numbers
+    void create_line(BasicBlock* cur_bb, string target_b, int num_s, Function &F);//
     void cfg_transfer(Function &F);
     bool dfs(BasicBlock* start, BasicBlock* end);
     void insert_fakeins(void);
@@ -91,8 +91,8 @@ void SkeletonPass::select_ins(Function &F)
   
   for (int i=0; i<bb_vector.size(); i++)
   {
-      //BasicBlock *cur_bb=&*bs;
-      //cur_bb=&*bs;
+      //
+      //
       cur_bb=bb_vector[i];
       if(!cur_bb->getTerminator())
       {
@@ -106,9 +106,9 @@ void SkeletonPass::select_ins(Function &F)
       if (isa<BranchInst>(cur_bb->getTerminator()))
       {
         BranchInst*br=cast<BranchInst>(cur_bb->getTerminator());
-        if (br->isUnconditional())//direct jmp
+        if (br->isUnconditional())//
         {
-          if(false)//cut line
+          if(false)//
           {
             id=0;
             BasicBlock *new_bb=BasicBlock::Create(Context, "jmp", &F);
@@ -116,12 +116,12 @@ void SkeletonPass::select_ins(Function &F)
             br->setSuccessor(id, new_bb);
             B.SetInsertPoint(new_bb);
             B.CreateBr(suc_bb);
-            if(PHINode* phi_ins=dyn_cast <PHINode>(suc_bb->begin()))//check phinode
+            if(PHINode* phi_ins=dyn_cast <PHINode>(suc_bb->begin()))//
             {
               phi_ins->replaceIncomingBlockWith(cur_bb, new_bb);
             }
           }
-          else//add cond jmp
+          else//
           {
             BasicBlock *new_bb=BasicBlock::Create(Context, "jmp", &F);
             BasicBlock *suc_bb=br->getSuccessor(0);
@@ -131,18 +131,18 @@ void SkeletonPass::select_ins(Function &F)
             B.CreateCondBr(fake, new_bb, suc_bb);
             B.SetInsertPoint(new_bb);
             B.CreateBr(suc_bb);
-            if(PHINode* phi_ins=dyn_cast <PHINode>(suc_bb->begin()))//check phinode
+            if(PHINode* phi_ins=dyn_cast <PHINode>(suc_bb->begin()))//
             {
-              //phi_ins->replaceIncomingBlockWith(cur_bb, new_bb);
+              //
               Value* v_tmp=phi_ins->getIncomingValue(0);
               phi_ins->addIncoming(v_tmp, new_bb);
             }
           }
-          //new_bb->setSuccessor(0,suc_bb);
+          //
         }
-        else if (br->isConditional())//conditional jmp
+        else if (br->isConditional())//
         {
-          if(true)//cut line
+          if(true)//
           {
             id=1;
             BasicBlock *new_bb=BasicBlock::Create(Context, "jmp", &F);
@@ -150,60 +150,60 @@ void SkeletonPass::select_ins(Function &F)
             br->setSuccessor(id, new_bb);
             B.SetInsertPoint(new_bb);
             B.CreateBr(suc_bb);
-            if(PHINode* phi_ins=dyn_cast <PHINode>(suc_bb->begin()))//check phinode
+            if(PHINode* phi_ins=dyn_cast <PHINode>(suc_bb->begin()))//
             {
               phi_ins->replaceIncomingBlockWith(cur_bb, new_bb);
             }
           }
-          //new_bb->setSuccessor(0,suc_bb);
+          //
         }
 
 
 
 
       }
-      // if(isa<BranchInst>(cur_bb->getTerminator()))
-      // {
-      //   BranchInst*br=cast<BranchInst>(cur_bb->getTerminator());
-      //   if
-      // }
+      //
+      //
+      //
+      //
+      //
       }
 }
-void SkeletonPass::create_line(BasicBlock* cur_bb, string target_b, int num_s, Function &F)//int num_s;//target_b successor numbers
+void SkeletonPass::create_line(BasicBlock* cur_bb, string target_b, int num_s, Function &F)//
 {
   pair<BasicBlock*, BasicBlock*> p1;
   
   
 
-  //static LLVMContext Context;
+  //
 
   Function::iterator fi;
   Function::iterator bs, be;
   IRBuilder<> B(Context);
   
-  //int num_s;//to do: how to acquire num_s
-  if(!cur_bb->getTerminator())//A block has no successor
+  //
+  if(!cur_bb->getTerminator())//
   {
-    if(num_s==1)//insert unconditonal branch
+    if(num_s==1)//
     {
       for(int i=0; i<num_s; i++)
       {
-        //to do name[i], the i success of target_b
-        //map name[i] -> suc_bb;
-        string suc_name=suc_str[target_b][i];//suc name of target
-        string cor_name=map_b_r[suc_name];//corrresponding source name
+        //
+        //
+        string suc_name=suc_str[target_b][i];//
+        string cor_name=map_b_r[suc_name];//
         BasicBlock* suc_bb=map_n_b[cor_name];
         
         B.SetInsertPoint(cur_bb);
         B.CreateBr(suc_bb);
-        if(PHINode* phi_ins=dyn_cast <PHINode>(suc_bb->begin()))//check phinode
+        if(PHINode* phi_ins=dyn_cast <PHINode>(suc_bb->begin()))//
         {
           Value* v_tmp=phi_ins->getIncomingValue(0);
           phi_ins->addIncoming(v_tmp, cur_bb);
         }
       }
     }
-    else if (num_s==2)// insert conditional branch
+    else if (num_s==2)//
     {
       B.SetInsertPoint(cur_bb);
       Value* fake=ConstantInt::getFalse(Context);
@@ -211,38 +211,38 @@ void SkeletonPass::create_line(BasicBlock* cur_bb, string target_b, int num_s, F
       BranchInst*br = cast<BranchInst>(cur_bb->getTerminator());
       for(int i=0; i<num_s; i++)
       {
-        //to do name[i], the i success of target_b
-        //map name[i] -> suc_bb;
-        string suc_name=suc_str[target_b][i];//suc name of target
-        string cor_name=map_b_r[suc_name];//corrresponding source name
+        //
+        //
+        string suc_name=suc_str[target_b][i];//
+        string cor_name=map_b_r[suc_name];//
         BasicBlock* suc_bb=map_n_b[cor_name];
         br->setSuccessor(i, suc_bb);
-        if(PHINode* phi_ins=dyn_cast <PHINode>(suc_bb->begin()))//check phinode
+        if(PHINode* phi_ins=dyn_cast <PHINode>(suc_bb->begin()))//
         {
           Value* v_tmp=phi_ins->getIncomingValue(0);
           phi_ins->addIncoming(v_tmp, cur_bb);
         }
       }
     }
-    else if(num_s==0)// match return or 0 out block
+    else if(num_s==0)//
     {
       errs()<<"encounter retrun 1\n";
       B.SetInsertPoint(cur_bb);
-      //Value* fake=ConstantFP::get(Type::getDoubleTy(Context), 0.0);
-      //B.CreateRet(0);
-      //B.CreateRet(fake);
+      //
+      //
+      //
 
       auto *new_inst = returninst->clone();
       cur_bb->getInstList().push_back(new_inst); 
-      //new_inst->insertBefore(&*(cur_bb->end()));
-      //Instruction *pi = &*cur_bb->end(); 
-      //Instruction *newInst = new Instruction(...); 
+      //
+      //
+      //
 
-      //cur_bb->getInstList().insertAfter(pi, dyn_cast<Instruction>(new_inst));
-      //cur_bb->dump();
-      //returninst
+      //
+      //
+      //
     }
-    else// insert switch branch, to do
+    else//
     {
       return;
     }
@@ -250,19 +250,19 @@ void SkeletonPass::create_line(BasicBlock* cur_bb, string target_b, int num_s, F
   else if (isa<BranchInst>(cur_bb->getTerminator()))
   {
     BranchInst*br=cast<BranchInst>(cur_bb->getTerminator());
-    if (br->isUnconditional())//direct jmp
+    if (br->isUnconditional())//
     {
-      if(num_s==1)//insert unconditonal branch
+      if(num_s==1)//
       {
         for(int i=0; i<num_s; i++)
         {
-          //to do name[i], the i success of target_b
-          //map name[i] -> suc_bb;
-          string suc_name=suc_str[target_b][i];//suc name of target
-          string cor_name=map_b_r[suc_name];//corrresponding source name
+          //
+          //
+          string suc_name=suc_str[target_b][i];//
+          string cor_name=map_b_r[suc_name];//
           BasicBlock* suc_bb=map_n_b[cor_name];
           
-          BasicBlock *ori_suc_bb=br->getSuccessor(i);//get original successor
+          BasicBlock *ori_suc_bb=br->getSuccessor(i);//
           if(ori_suc_bb==suc_bb)
           {
             break;
@@ -270,7 +270,7 @@ void SkeletonPass::create_line(BasicBlock* cur_bb, string target_b, int num_s, F
           else
           {
             br->setSuccessor(i, suc_bb);
-            //to do, cur_b, ori_suc_bb save to struct, element.
+            //
             p1.first=cur_bb;
             p1.second=ori_suc_bb;
             cut_pair.push_back(p1);
@@ -289,42 +289,42 @@ void SkeletonPass::create_line(BasicBlock* cur_bb, string target_b, int num_s, F
           
         }
       }
-      else if (num_s==2)// insert conditional branch
+      else if (num_s==2)//
       {
-        //BasicBlock *new_bb=BasicBlock::Create(Context, "jmp", &F);
+        //
         BasicBlock *ori_suc_bb=br->getSuccessor(0);
         cur_bb->getTerminator()->eraseFromParent();
         B.SetInsertPoint(cur_bb);
         Value* True=ConstantInt::getTrue(Context);
         Value* fake=ConstantInt::getFalse(Context);
-        //B.CreateCondBr(fake, new_bb, suc_bb);
-        //B.SetInsertPoint(new_bb);
-        //B.CreateBr(suc_bb);
+        //
+        //
+        //
         int flag=0;
         for(int i=0; i<num_s; i++)
         {
-          //to do name[i], the i success of target_b
-          //map name[i] -> suc_bb;
-          string suc_name=suc_str[target_b][i];//suc name of target
-          string cor_name=map_b_r[suc_name];//corrresponding source name
+          //
+          //
+          string suc_name=suc_str[target_b][i];//
+          string cor_name=map_b_r[suc_name];//
           BasicBlock* suc_bb=map_n_b[cor_name];
           
           if(ori_suc_bb==suc_bb && i==0)
           {
             flag=1;
             
-            // to do: suc_bb_next is the next of suc_bb, suggest to use suc_bb corpus, suc_bb should be tmp var
+            //
             string suc_name=suc_str[target_b][1];
             string cor_name=map_b_r[suc_name];
             BasicBlock* suc_bb_next=map_n_b[cor_name];
 
             B.CreateCondBr(True, suc_bb, suc_bb_next);
-            if(PHINode* phi_ins=dyn_cast <PHINode>(suc_bb->begin()))//check phinode
+            if(PHINode* phi_ins=dyn_cast <PHINode>(suc_bb->begin()))//
             {
               Value* v_tmp=phi_ins->getIncomingValue(0);
               phi_ins->addIncoming(v_tmp, cur_bb);
             }
-            if(PHINode* phi_ins=dyn_cast <PHINode>(suc_bb_next->begin()))//check phinode
+            if(PHINode* phi_ins=dyn_cast <PHINode>(suc_bb_next->begin()))//
             {
               Value* v_tmp=phi_ins->getIncomingValue(0);
               phi_ins->addIncoming(v_tmp, cur_bb);
@@ -334,18 +334,18 @@ void SkeletonPass::create_line(BasicBlock* cur_bb, string target_b, int num_s, F
           else if(ori_suc_bb==suc_bb && i==1)
           {
             flag=1;
-            // to do: suc_bb_front is front of suc_bb
+            //
             string suc_name=suc_str[target_b][0];
             string cor_name=map_b_r[suc_name];
             BasicBlock* suc_bb_front=map_n_b[cor_name];
 
             B.CreateCondBr(fake, suc_bb_front, suc_bb);
-            if(PHINode* phi_ins=dyn_cast <PHINode>(suc_bb->begin()))//check phinode
+            if(PHINode* phi_ins=dyn_cast <PHINode>(suc_bb->begin()))//
             {
               Value* v_tmp=phi_ins->getIncomingValue(0);
               phi_ins->addIncoming(v_tmp, cur_bb);
             }
-            if(PHINode* phi_ins=dyn_cast <PHINode>(suc_bb_front->begin()))//check phinode
+            if(PHINode* phi_ins=dyn_cast <PHINode>(suc_bb_front->begin()))//
             {
               Value* v_tmp=phi_ins->getIncomingValue(0);
               phi_ins->addIncoming(v_tmp, cur_bb);
@@ -363,55 +363,55 @@ void SkeletonPass::create_line(BasicBlock* cur_bb, string target_b, int num_s, F
           cor_name=map_b_r[suc_name];
           BasicBlock* suc_bb=map_n_b[cor_name];
           B.CreateCondBr(fake, suc_bb_front, suc_bb);
-          //to do, cur_b, ori_suc_bb save to struct, element.
+          //
           p1.first=cur_bb;
           p1.second=ori_suc_bb;
           cut_pair.push_back(p1);
 
-          if(PHINode* phi_ins=dyn_cast <PHINode>(suc_bb->begin()))//check phinode
+          if(PHINode* phi_ins=dyn_cast <PHINode>(suc_bb->begin()))//
           {
             Value* v_tmp=phi_ins->getIncomingValue(0);
             phi_ins->addIncoming(v_tmp, cur_bb);
           }
-          if(PHINode* phi_ins=dyn_cast <PHINode>(suc_bb_front->begin()))//check phinode
+          if(PHINode* phi_ins=dyn_cast <PHINode>(suc_bb_front->begin()))//
           {
             Value* v_tmp=phi_ins->getIncomingValue(0);
             phi_ins->addIncoming(v_tmp, cur_bb);
           }
         }
       }
-      else// insert switch branch, to do
+      else//
       {
         return;
       }
-      //new_bb->setSuccessor(0,suc_bb);
+      //
     }
-    else if (br->isConditional())//conditional jmp
+    else if (br->isConditional())//
     {
       if(num_s==2){
         BasicBlock *ori_suc_bb=br->getSuccessor(0);
         
-        string suc_name=suc_str[target_b][1];//suc name of target
-        string cor_name=map_b_r[suc_name];//corrresponding source name
+        string suc_name=suc_str[target_b][1];//
+        string cor_name=map_b_r[suc_name];//
         BasicBlock* suc_bb_next=map_n_b[cor_name];
         
 
         if(ori_suc_bb==suc_bb_next)
         {
-          //to do: exchange suc_bb suc_bb_next
+          //
           suc_str[target_b][1]=suc_str[target_b][0];
           suc_str[target_b][0]=suc_name;
         }
         for(int i=0; i<num_s; i++)
         {
-          //to do name[i], the i success of target_b
-          //map name[i] -> suc_bb;
-          string suc_name=suc_str[target_b][i];//suc name of target
-          string cor_name=map_b_r[suc_name];//corrresponding source name
+          //
+          //
+          string suc_name=suc_str[target_b][i];//
+          string cor_name=map_b_r[suc_name];//
           BasicBlock* suc_bb=map_n_b[cor_name];
           
-          BasicBlock *ori_suc_bb=br->getSuccessor(i);//get original successor
-          if(ori_suc_bb==suc_bb)//刚好匹配
+          BasicBlock *ori_suc_bb=br->getSuccessor(i);//
+          if(ori_suc_bb==suc_bb)//
           {
             continue;
           }
@@ -419,12 +419,12 @@ void SkeletonPass::create_line(BasicBlock* cur_bb, string target_b, int num_s, F
           {
 
             br->setSuccessor(i, suc_bb);
-            //to do, cur_b, ori_suc_bb save to struct, element.
+            //
             p1.first=cur_bb;
             p1.second=ori_suc_bb;
             cut_pair.push_back(p1);
 
-            if(PHINode* phi_ins=dyn_cast <PHINode>(suc_bb->begin()))//check phinode
+            if(PHINode* phi_ins=dyn_cast <PHINode>(suc_bb->begin()))//
             {
               Value* v_tmp=phi_ins->getIncomingValue(0);
               phi_ins->addIncoming(v_tmp, cur_bb);
@@ -432,51 +432,51 @@ void SkeletonPass::create_line(BasicBlock* cur_bb, string target_b, int num_s, F
           }
         }
       }
-      else if(num_s>2){// insert switch branch, to do
+      else if(num_s>2){//
         return ;
       }
-      //new_bb->setSuccessor(0,suc_bb);
+      //
     }
   }
   else if (isa<SwitchInst>(cur_bb->getTerminator()))
   {
-    //to do
+    //
     return;
   }
   else if (isa<ReturnInst>(cur_bb->getTerminator()))
   {
     returninst=dyn_cast<ReturnInst>(cur_bb->getTerminator());
-    if(num_s==1)//insert unconditonal branch
+    if(num_s==1)//
     {
       for(int i=0; i<num_s; i++)
       {
-        //to do name[i], the i success of target_b
-        //map name[i] -> suc_bb;
-        string suc_name=suc_str[target_b][i];//suc name of target
-        string cor_name=map_b_r[suc_name];//corrresponding source name
+        //
+        //
+        string suc_name=suc_str[target_b][i];//
+        string cor_name=map_b_r[suc_name];//
         BasicBlock* suc_bb=map_n_b[cor_name];
         
         cur_bb->getTerminator()->eraseFromParent();
         B.SetInsertPoint(cur_bb);
         B.CreateBr(suc_bb);
-        if(PHINode* phi_ins=dyn_cast <PHINode>(suc_bb->begin()))//check phinode
+        if(PHINode* phi_ins=dyn_cast <PHINode>(suc_bb->begin()))//
         {
           Value* v_tmp=phi_ins->getIncomingValue(0);
           phi_ins->addIncoming(v_tmp, cur_bb);
         }
       }
     }
-    else if (num_s==2)// insert conditional branch
+    else if (num_s==2)//
     {
-      //BasicBlock *new_bb=BasicBlock::Create(Context, "jmp", &F);
-      //BasicBlock *ori_suc_bb=br->getSuccessor(0);
+      //
+      //
       cur_bb->getTerminator()->eraseFromParent();
       B.SetInsertPoint(cur_bb);
       Value* True=ConstantInt::getTrue(Context);
       Value* fake=ConstantInt::getFalse(Context);
-      //B.CreateCondBr(fake, new_bb, suc_bb);
-      //B.SetInsertPoint(new_bb);
-      //B.CreateBr(suc_bb);
+      //
+      //
+      //
       
       string suc_name=suc_str[target_b][0];
       string cor_name=map_b_r[suc_name];
@@ -487,36 +487,36 @@ void SkeletonPass::create_line(BasicBlock* cur_bb, string target_b, int num_s, F
       BasicBlock* suc_bb=map_n_b[cor_name];
       B.CreateCondBr(fake, suc_bb_front, suc_bb);
 
-      if(PHINode* phi_ins=dyn_cast <PHINode>(suc_bb->begin()))//check phinode
+      if(PHINode* phi_ins=dyn_cast <PHINode>(suc_bb->begin()))//
       {
         Value* v_tmp=phi_ins->getIncomingValue(0);
         phi_ins->addIncoming(v_tmp, cur_bb);
       }
-      if(PHINode* phi_ins=dyn_cast <PHINode>(suc_bb_front->begin()))//check phinode
+      if(PHINode* phi_ins=dyn_cast <PHINode>(suc_bb_front->begin()))//
       {
         Value* v_tmp=phi_ins->getIncomingValue(0);
         phi_ins->addIncoming(v_tmp, cur_bb);
       }
     }
-    else if(num_s==0)// match return or 0 out block
+    else if(num_s==0)//
     {
-      // B.SetInsertPoint(cur_bb);
-      // //Value* fake=ConstantInt::getFalse(Context);
-      // //B.CreateRet(0);
-      // //B.CreateRetVoid();
-      // Value* fake=ConstantFP::get(Type::getDoubleTy(Context), 0.0);
-      // //B.CreateRet(0);
-      // B.CreateRet(fake);
+      //
+      //
+      //
+      //
+      //
+      //
+      //
       
-      //Value* fake=ConstantFP::get(Type::getDoubleTy(Context), 0.0);
-      //B.CreateRet(0);
-      //B.CreateRet(fake);
-      // B.SetInsertPoint(cur_bb);
-      // auto *new_inst = returninst->clone();
-      // cur_bb->getInstList().push_back(new_inst); 
+      //
+      //
+      //
+      //
+      //
+      //
 
     }
-    else// insert switch branch, to do
+    else//
     {
       return;
     }
@@ -527,7 +527,7 @@ void SkeletonPass::create_line(BasicBlock* cur_bb, string target_b, int num_s, F
       
 void SkeletonPass::cfg_transfer(Function &F)
 {
-  //static LLVMContext Context;
+  //
   Function::iterator fi;
   Function::iterator bs, be;
   IRBuilder<> B(Context);
@@ -554,7 +554,7 @@ void SkeletonPass::cfg_transfer(Function &F)
   map_b_r.clear();
 
   std::ifstream in_f;
-  in_f.open(" ./passmatch.txt");//open match basic block, may need to change call
+  in_f.open(" ./passmatch.txt");//
   if( ! in_f.is_open() ) {
     errs() << "[ERROR]fail to open match.txt" << "\n";
     exit(0);
@@ -562,7 +562,7 @@ void SkeletonPass::cfg_transfer(Function &F)
   
   string match_l;
   match_l.clear();
-  while(getline(in_f, match_l))// record source -> target basics; and target -> source basics
+  while(getline(in_f, match_l))//
   {
     string source, target;
     int pos=match_l.find(" ");
@@ -574,36 +574,36 @@ void SkeletonPass::cfg_transfer(Function &F)
   in_f.close();
 
 
-  //StringRef str_ref = F.getName();
-  //std::string str_suc ="printsTray"; //str_ref.data();
+  //
+  //
   std::string str_suc =funcBname;
   std::ifstream in_b_suc;
   string func_dir=" ./passfunc/";
   
-  in_b_suc.open(func_dir+str_suc+ "_suc.txt");//txt: target block, number of suc
+  in_b_suc.open(func_dir+str_suc+ "_suc.txt");//
   string suc_l;
   suc_l.clear();
   suc_num.clear();
   
-  int num_e=bb_vector.size();//existing block number
-  getline(in_b_suc, suc_l);//read basic block number
+  int num_e=bb_vector.size();//
+  getline(in_b_suc, suc_l);//
   int pos=suc_l.find(" ");
   suc_l=suc_l.substr(0, pos);
-  int num_insert=stoi(suc_l)-source_basic_num;//number of basicblocks to add
+  int num_insert=stoi(suc_l)-source_basic_num;//
   for (int i=0; i< num_insert; i++)
   {
     BasicBlock *new_bb=BasicBlock::Create(Context, "jmp", &F);  
-    //PHINode* phi_ins=dyn_cast <PHINode>(new_bb->begin());      
-    //Instruction* block=&*j;
+    //
+    //
     IRBuilder<NoFolder> builder(new_bb);
-    // builder.SetInsertPoint(new_bb);
+    //
     Value *x = ConstantInt::get(Type::getInt32Ty(Context), 3);
     Value *y = ConstantInt::get(Type::getInt32Ty(Context), 2);
     Value *z = ConstantInt::get(Type::getInt32Ty(Context), 4);
     Value *tmp2 = builder.CreateBinOp(Instruction::Add, x, y, "tmp");
     
 
-    // 
+    //
 
 
 
@@ -612,9 +612,9 @@ void SkeletonPass::cfg_transfer(Function &F)
     bb_fakeins.push_back(new_bb);
   }
 
-  //target_suc.clear();
+  //
   
-  int count_tmp=0;//the index of created block in bb_vector
+  int count_tmp=0;//
   while(getline(in_b_suc, suc_l))
   {
     string source, target;
@@ -626,16 +626,16 @@ void SkeletonPass::cfg_transfer(Function &F)
     suc_num[source]=stoi(target);
     int i=stoi(target);
     tail=tail.substr(pos+1);
-    while(i--)//insert suc name to the map
+    while(i--)//
     {
       pos=tail.find(" ");
       target=tail.substr(0, pos);
-      //tmp_=tail.substr(pos+1:);
+      //
       suc_str[source].push_back(target);
       tail=tail.substr(pos+1);
     }
 
-    if (map_b_r.count(source) == 0)// establish relationship between target blocks with new created blocks
+    if (map_b_r.count(source) == 0)//
     {
       std::string str = bb_vector[num_e+count_tmp]->getName().data();
       map_b[str] = source;
@@ -645,44 +645,44 @@ void SkeletonPass::cfg_transfer(Function &F)
     }
   }
   
-  // std::string entry_s = "entry";
-  // errs() << "check:" << map_b[entry_s] << " " << entry_s << "\n";
-  // if (map_b[entry_s] != entry_s)//somtimes entry not matches entry,  thus need to change entry
-  // {
-  //   BasicBlock* i_ori = map_n_b[entry_s];
-  //   std::string old_entry = "old_entry";
-  //   i_ori->setName(old_entry);
+  //
+  //
+  //
+  //
+  //
+  //
+  //
     
-  //   BasicBlock* i_tmp;
-  //   std::string target_s = map_b_r[entry_s];
-  //   i_tmp = map_n_b[target_s];
+  //
+  //
+  //
 
-  //   // for (BasicBlock::iterator DI = i_tmp->begin(); DI != i_tmp->end(); ) 
-  //   // {
-  //   //   Instruction *Inst = &*DI;
-  //   //   Inst->eraseFromParent();
-  //   //   DI++;
-  //   // }
+  //
+  //
+  //
+  //
+  //
+  //
 
 
    
-  //   i_tmp->removeFromParent();
-  //   i_tmp->removeFromParent();
-  //   for (Instruction &I : *i_tmp)
-  //   {
-  //     I.removeFromParent();
-  //   }
-  //   i_tmp->insertInto(&F, i_ori);
-  //   i_tmp->setName(entry_s);
-  //   IRBuilder<NoFolder> builder(i_tmp);
-  //   Value *x = ConstantInt::get(Type::getInt32Ty(Context), 3);
-  //   Value *y = ConstantInt::get(Type::getInt32Ty(Context), 2);
-  //   Value *z = ConstantInt::get(Type::getInt32Ty(Context), 4);
-  //   Value *tmp2 = builder.CreateBinOp(Instruction::Add, x, y, "tmp");
+  //
+  //
+  //
+  //
+  //
+  //
+  //
+  //
+  //
+  //
+  //
+  //
+  //
 
 
-  //   errs()<<"Function first:"<<F.begin()->getName()<<"\n";
-  // }
+  //
+  //
 
 
 
@@ -690,20 +690,20 @@ void SkeletonPass::cfg_transfer(Function &F)
 
   for (int i=0; i<bb_vector.size(); i++)
   {
-      //BasicBlock *cur_bb=&*bs;
-      //cur_bb=&*bs;
+      //
+      //
       cur_bb=bb_vector[i];
-      string target_b=map_b[cur_bb->getName()];//get target B's block name
+      string target_b=map_b[cur_bb->getName()];//
       create_line(cur_bb, target_b, suc_num[target_b], F);
   }
   
   //
-  int num_recover=0;//struct node number;
+  int num_recover=0;//
   num_recover=cut_pair.size();
-  for(int i=0; i<num_recover; i++)//iterate to recover lines between blocks
+  for(int i=0; i<num_recover; i++)//
   {
-    BasicBlock* start=cut_pair[i].first;//to do
-    BasicBlock* end=cut_pair[i].second;//to do
+    BasicBlock* start=cut_pair[i].first;//
+    BasicBlock* end=cut_pair[i].second;//
     bool flag=false;
     flag=dfs(start, end);
   }
@@ -714,9 +714,9 @@ void SkeletonPass::cfg_transfer(Function &F)
 }
 bool SkeletonPass::dfs(BasicBlock* start, BasicBlock* end){
   BasicBlock* tmp=start;
-  int num_suc=0;//success number for current block
+  int num_suc=0;//
 
-  //num_suc=tmp->getTerminator()->getNumSuccessors();
+  //
   if(!(tmp->getTerminator()))
   {
     return false;
@@ -724,7 +724,7 @@ bool SkeletonPass::dfs(BasicBlock* start, BasicBlock* end){
   else if (isa<BranchInst>(tmp->getTerminator()))
   {
     BranchInst*br = cast<BranchInst>(tmp->getTerminator());
-    if (br->isUnconditional())//direct jmp
+    if (br->isUnconditional())//
     {
       num_suc=1;
     }
@@ -739,10 +739,10 @@ bool SkeletonPass::dfs(BasicBlock* start, BasicBlock* end){
     {
       
       BasicBlock* suc = br->getSuccessor(j);
-      if(suc == end)//success!
+      if(suc == end)//
       {
-        //delete blocks need to be executed
-        //bb_fakeins.remove(tmp);
+        //
+        //
         auto iter = std::remove(bb_fakeins.begin(), bb_fakeins.end(), tmp);
         bb_fakeins.erase(iter, bb_fakeins.end());
 
@@ -762,10 +762,10 @@ bool SkeletonPass::dfs(BasicBlock* start, BasicBlock* end){
       else 
       {
         bool flag=false;
-        if(visit[suc]==0)//to do: define visit
+        if(visit[suc]==0)//
         {
           string b_name=suc->getName().data();
-          if(b_name.find("jmp")==b_name.npos){//to do, existing block cannot be iterated
+          if(b_name.find("jmp")==b_name.npos){//
             continue;
           }
           visit[suc]=1;
@@ -773,13 +773,13 @@ bool SkeletonPass::dfs(BasicBlock* start, BasicBlock* end){
           visit[suc]=0;
           if(flag)
           {
-            //delete blocks need to be executed
-            //bb_fakeins.remove(tmp);
+            //
+            //
             auto iter = std::remove(bb_fakeins.begin(), bb_fakeins.end(), tmp);
             bb_fakeins.erase(iter, bb_fakeins.end());
 
             if(num_suc==2){
-              //errs()<<"set cond!\n";
+              //
               if(br->getCondition()==True || br->getCondition()==fake)
               {
                 if(j==0){
@@ -792,17 +792,17 @@ bool SkeletonPass::dfs(BasicBlock* start, BasicBlock* end){
             }
             return true;
           }
-          //return false;
+          //
         }
 
       }
     }
     return false;
-    //visit[tmp]=1; 
+    //
   }
   else if (isa<SwitchInst>(tmp->getTerminator()))
   {
-    //to do
+    //
     return false;
   }
     
@@ -816,10 +816,10 @@ void SkeletonPass::insert_fakeins(void){
   std::string filepath = " ./pass";
   in_f.open(filepath + "flag_tar.txt", ios_base::in);
   string s;
-  map<string, int> len_v;//len of current block
+  map<string, int> len_v;//
   len_v.clear();
 
-  map<string, int> s_pos;//start pos of current block
+  map<string, int> s_pos;//
   s_pos.clear();
   while (getline(in_f, s))
   {
@@ -848,9 +848,9 @@ void SkeletonPass::insert_fakeins(void){
     target_bname.clear();
     target_bname=map_b[tem_myasm];
     int num, pos_s_n;
-    num=len_v[target_bname];//the number of ins to insert;
+    num=len_v[target_bname];//
     pos_s_n=s_pos[target_bname];
-    for(int i=0; i<num; i++)//insert nop, to do, phi node?
+    for(int i=0; i<num; i++)//
     {
       string nop_="nop";
       StringRef myasm_start = llvm::StringRef("nop");
@@ -858,7 +858,7 @@ void SkeletonPass::insert_fakeins(void){
       llvm::InlineAsm *IA = llvm::InlineAsm::get(FunctionType::get(B.getVoidTy(), false), myasm_start, StringRef(cons), true);
       BasicBlock* cur_bb=tmp;
       llvm::BasicBlock::iterator it=cur_bb->begin();
-      //it--;
+      //
 
       B.SetInsertPoint(cur_bb, it);
       B.CreateCall(IA, {});
@@ -868,20 +868,20 @@ void SkeletonPass::insert_fakeins(void){
     string tem_myasm_start;
     tem_myasm_start=tem_myasm+"_s:";
     
-    //errs()<<"tem_myasm_start:"<<tem_myasm_start<<" "<<F.getName().data()<<"\n";
+    //
     StringRef myasm_start = llvm::StringRef(tem_myasm_start);
     string cons="~{dirflag},~{fpsr},~{flags}";
     llvm::InlineAsm *IA = llvm::InlineAsm::get(FunctionType::get(B.getVoidTy(), false), myasm_start, StringRef(cons), true);
     BasicBlock* cur_bb=tmp;
     llvm::BasicBlock::iterator it=cur_bb->begin();
-    //it--;
+    //
 
     B.SetInsertPoint(cur_bb, it);
     B.CreateCall(IA, {});
 
 
     it=cur_bb->end();
-    it--;//insert before the last ins
+    it--;//
     string tem_myasm_end;
     tem_myasm_end=tem_myasm+"_e:";
     StringRef myasm_end = llvm::StringRef(tem_myasm_end);
@@ -889,27 +889,27 @@ void SkeletonPass::insert_fakeins(void){
     B.SetInsertPoint(cur_bb, it);
     B.CreateCall(IA, {});
     
-    out_f << tem_myasm_start << " " << tem_myasm_end << " " << pos_s_n << " " << num << "\n";//print all labels name;
+    out_f << tem_myasm_start << " " << tem_myasm_end << " " << pos_s_n << " " << num << "\n";//
     
 
     Value* True=ConstantInt::getTrue(Context);
     if (isa<BranchInst>(tmp->getTerminator()))
     {
       BranchInst*br=cast<BranchInst>(tmp->getTerminator());
-      if (br->isConditional())//conditional jmp
+      if (br->isConditional())//
       {
         br->setCondition (True);
         string t_s, s_t_;
         t_s= tmp->getName().data();
         s_t_="jmp1";
-        if(True)//(t_s==s_t_)
+        if(True)//
         {
           BasicBlock* i1= br->getSuccessor(0);
           BasicBlock* i2= br->getSuccessor(1);
           br->setSuccessor(0, i2);
           br->setSuccessor(1, i1);
         }
-        //new_bb->setSuccessor(0,suc_bb);
+        //
       }
     }
   }
@@ -923,22 +923,22 @@ void SkeletonPass::insert_fakeins(void){
 
 char SkeletonPass::ID = 0;
 
-// Automatically enable the pass.
-// http://adriansampson.net/blog/clangpass.html
-// static void registerSkeletonPass(const PassManagerBuilder &,
-//                          legacy::PassManagerBase &PM) {
-//   PM.add(new SkeletonPass());
-// }
-// static RegisterStandardPasses
-//   RegisterMyPass(PassManagerBuilder::EP_EarlyAsPossible,
-//                  registerSkeletonPass);
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 
-// char Hello::ID = 0;
+//
 static RegisterPass<SkeletonPass> X("hello", "Hello World Pass",
                           false /* Only looks at CFG */,
                           false /* Analysis Pass */);
-// static llvm::RegisterStandardPasses Y(
-//     llvm::PassManagerBuilder::EP_EarlyAsPossible,
-//     [](const llvm::PassManagerBuilder &Builder,
+//
+//
+//
 //         llvm::legacy::PassManagerBase &PM) { PM.add(new Hello()); });

@@ -30,6 +30,6 @@ if __name__ == '__main__':
     for file in files:
       f = os.path.join(root,file)
       if file.endswith(".bc") :
-        os.system("opt -load /llvm-project-10.0.1/build/lib/Transforms/GetCFG/getcfg/libGetCFG.so -getcfg " + f + " -o " + f[:-3] + "_changed.bc" )
+        os.system("opt -load ./libGetCFG.so -getcfg " + f + " -o " + f[:-3] + "_changed.bc" )
         
 
