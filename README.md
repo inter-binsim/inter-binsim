@@ -1,6 +1,4 @@
-# Inter Binsim
-
-This is an example of \delta CFG.
+An example code of $\delta$CFG. We will release all code when this work is accepted.
 
 ## GraphEmb
 
