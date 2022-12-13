@@ -1,4 +1,4 @@
-An example code of $\delta$CFG. We will release all code when this work is accepted.
+An example code of $\Delta$CFG. We will release all code when this work is accepted.
 
 ## GraphEmb
 
