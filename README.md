@@ -1,14 +1,10 @@
-An example code of $\Delta$CFG. We will release all code when this work is accepted.
 
-## GraphEmb
+## GraphEmb&LLVM-Bash&Binsim-data-master
 
-It shows the code of one of the models in our work.
+Example code of $\Delta$CFG. We will release all code when this work is accepted.
 
-## binsim-data-master
 
-It shows how to get the extract of the binary with IDA
-
-## virus-worm
+## Virus-worm
 
 It contains a simple example of Malware. 
 From: https://github.com/chsclarke/Virus
