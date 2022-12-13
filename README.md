@@ -1,10 +1,10 @@
 # Inter Binsim
 
-This is an example of our works.
+This is an example of \delta CFG.
 
 ## GraphEmb
 
-It shows the code of one of the models in our works.
+It shows the code of one of the models in our work.
 
 ## binsim-data-master
 
